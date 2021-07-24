@@ -133,7 +133,7 @@ func scanFiles(folder string) (files []file) {
 		if f == nil {
 			continue
 		}
-		f.URL = filepath.Join(cfg.BaseURL, folder, c.Name())
+		f.URL = cfg.BaseURL + filepath.Join(folder, c.Name())
 		f.Sha512 = calculateSha512(filepath.Join(cfg.ArtifactsPath, folder, c.Name()))
 		files = append(files, *f)
 	}
