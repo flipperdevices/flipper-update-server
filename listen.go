@@ -8,6 +8,7 @@ import (
 
 func handleReindex(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
+	r.ParseMultipartForm(32)
 	if r.FormValue("key") != cfg.Github.GithubToken {
 		w.WriteHeader(http.StatusForbidden)
 		w.Write([]byte("wrong key"))
