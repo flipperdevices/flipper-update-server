@@ -1,9 +1,9 @@
 package main
 
 import (
+	"crypto/sha256"
 	"crypto/sha512"
 	"encoding/hex"
-	"io/ioutil"
 	"os"
 	"regexp"
 )
@@ -44,11 +44,12 @@ func parseFilename(name string) *file {
 	return nil
 }
 
-func calculateSha512(path string) string {
-	f, err := ioutil.ReadFile(path)
-	if err != nil {
-		return ""
-	}
-	hash := sha512.Sum512(f)
+func calculateSha512(data []byte) string {
+	hash := sha512.Sum512(data)
+	return hex.EncodeToString(hash[:])
+}
+
+func calculateSha256(data []byte) string {
+	hash := sha256.Sum256(data)
 	return hex.EncodeToString(hash[:])
 }
