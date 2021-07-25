@@ -3,9 +3,9 @@ package main
 import (
 	"github.com/caarlos0/env/v6"
 	"github.com/flipper-zero/flipper-update-server/github"
+	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -38,9 +38,12 @@ func main() {
 
 	log.Println("Server started")
 
-	http.HandleFunc("/reindex", handleReindex)
-	http.HandleFunc("/directory.json", handleDirectory)
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	r := gin.New()
+
+	r.GET("/directory.json", serveDirectory)
+	r.POST("/reindex", handleReindex)
+
+	log.Fatal(r.Run(":8080"))
 }
 
 func regenDirectory() error {

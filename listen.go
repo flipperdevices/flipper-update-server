@@ -1,17 +1,14 @@
 package main
 
 import (
-	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 )
 
-func handleReindex(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	r.ParseMultipartForm(32)
-	if r.FormValue("key") != cfg.Github.GithubToken {
-		w.WriteHeader(http.StatusForbidden)
-		w.Write([]byte("wrong key"))
+func handleReindex(c *gin.Context) {
+	if c.PostForm("key") != cfg.Github.GithubToken {
+		c.String(http.StatusForbidden, "wrong key")
 		return
 	}
 
@@ -22,16 +19,9 @@ func handleReindex(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	w.Write([]byte("ok"))
+	c.String(http.StatusOK, "ok")
 }
 
-func handleDirectory(w http.ResponseWriter, r *http.Request) {
-	j, err := json.Marshal(latestDirectory)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(j)
+func serveDirectory(c *gin.Context) {
+	c.JSON(http.StatusOK, latestDirectory)
 }
