@@ -139,7 +139,6 @@ func scanFiles(folder string) (files []file) {
 		f.URL = cfg.BaseURL + filepath.Join(folder, c.Name())
 		bin, err := ioutil.ReadFile(filepath.Join(cfg.ArtifactsPath, folder, c.Name()))
 		if err == nil {
-			f.Sha512 = calculateSha512(bin)
 			f.Sha256 = calculateSha256(bin)
 		}
 		files = append(files, *f)
