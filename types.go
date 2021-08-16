@@ -23,5 +23,4 @@ type file struct {
 	Target string `json:"target"`
 	Type   string `json:"type"`
 	Sha256 string `json:"sha256"`
-	Sha512 string `json:"sha512"`
 }

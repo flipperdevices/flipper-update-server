@@ -4,7 +4,9 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strings"
 )
 
 var regexes = []*regexp.Regexp{
@@ -30,13 +32,38 @@ func arrayContains(stack []string, needle string) bool {
 }
 
 func parseFilename(name string) *file {
+	if strings.HasPrefix(name, "qFlipper") {
+		switch filepath.Ext(name) {
+		case ".dmg":
+			return &file{
+				Target: "macos/amd64",
+				Type:   "dmg",
+			}
+		case ".AppImage":
+			return &file{
+				Target: "linux/amd64",
+				Type:   "AppImage",
+			}
+		case ".zip":
+			return &file{
+				Target: "windows/amd64",
+				Type:   "portable",
+			}
+		case ".exe":
+			return &file{
+				Target: "windows/amd64",
+				Type:   "installer",
+			}
+		}
+	}
+
 	for _, re := range regexes {
 		m := re.FindAllStringSubmatch(name, -1)
 		if len(m) != 1 || len(m[0]) != 4 {
 			continue
 		}
 		return &file{
-			Type: m[0][2] + "_" + m[0][3],
+			Type:   m[0][2] + "_" + m[0][3],
 			Target: m[0][1],
 		}
 	}
