@@ -28,6 +28,6 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/flipper-zero/flipper-update-server:latest
+          tags: ghcr.io/flipperdevices/flipper-update-server:latest
       - name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

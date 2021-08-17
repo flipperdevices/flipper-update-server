@@ -10,7 +10,7 @@ import (
 )
 
 var regexes = []*regexp.Regexp{
-	regexp.MustCompile(`(?m)^flipper-z-(f[0-9]*)-(bootloader|firmware|full)-.*\.(dfu|bin|elf|hex)$`),
+	regexp.MustCompile(`(?m)^flipper-z-(f[0-9]*|any)-(bootloader|firmware|full|core2_firmware|scripts|resources)-.*\.(dfu|bin|elf|hex|tgz)$`),
 	regexp.MustCompile(`(?m)^(f[0-9]*)_(bootloader|firmware|full)\.(dfu|bin|elf|hex)$`),
 }
 
@@ -32,6 +32,7 @@ func arrayContains(stack []string, needle string) bool {
 }
 
 func parseFilename(name string) *file {
+	// TODO refactor this hardcoded crap
 	if strings.HasPrefix(name, "qFlipper") {
 		switch filepath.Ext(name) {
 		case ".dmg":
