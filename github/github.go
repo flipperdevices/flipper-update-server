@@ -34,11 +34,11 @@ func (gh *Github) Sync() error {
 	}
 	gh.releases = releases
 
-	branches, err := gh.fetchBranches()
+	branchesAndTags, err := gh.fetchBranchesAndTags()
 	if err != nil {
 		return errors.New("branches: " + err.Error())
 	}
-	gh.branches = branches
+	gh.branchesAndTags = branchesAndTags
 
 	dev, err := gh.fetchDev()
 	if err != nil {
@@ -57,7 +57,7 @@ func (gh *Github) Lookup(ref string) (*Version, bool) {
 	if ok {
 		return r, false
 	}
-	_, ok = gh.branches[ref]
+	_, ok = gh.branchesAndTags[ref]
 	return nil, ok
 }
 
@@ -81,7 +81,7 @@ func (gh *Github) fetchReleases() (map[string]*Version, error) {
 	return m, nil
 }
 
-func (gh *Github) fetchBranches() (map[string]struct{}, error) {
+func (gh *Github) fetchBranchesAndTags() (map[string]struct{}, error) {
 	branches, _, err := gh.c.Repositories.ListBranches(ctx, gh.cfg.RepoOwner, gh.cfg.RepoName, &github.BranchListOptions{
 		ListOptions: github.ListOptions{
 			Page:    1,
@@ -91,9 +91,19 @@ func (gh *Github) fetchBranches() (map[string]struct{}, error) {
 	if err != nil {
 		return nil, err
 	}
+	tags, _, err := gh.c.Repositories.ListTags(ctx, gh.cfg.RepoOwner, gh.cfg.RepoName, &github.ListOptions{
+		Page:    1,
+		PerPage: 100,
+	})
+	if err != nil {
+		return nil, err
+	}
 	m := make(map[string]struct{})
 	for _, b := range branches {
 		m[b.GetName()] = struct{}{}
+	}
+	for _, t := range tags {
+		m[t.GetName()] = struct{}{}
 	}
 	return m, nil
 }

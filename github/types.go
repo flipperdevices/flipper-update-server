@@ -9,7 +9,7 @@ type Github struct {
 	c        *github.Client
 	cfg      *Config
 	releases map[string]*Version
-	branches map[string]struct{}
+	branchesAndTags map[string]struct{}
 	dev      *Version
 }
 
