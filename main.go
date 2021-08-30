@@ -41,6 +41,7 @@ func main() {
 	r := gin.New()
 
 	r.GET("/directory.json", serveDirectory)
+	r.GET("/:channel/:target/:type", serveLatest)
 	r.POST("/reindex", handleReindex)
 
 	log.Fatal(r.Run(":8080"))
