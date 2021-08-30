@@ -33,6 +33,7 @@ func serveLatest(c *gin.Context) {
 	for _, i := range latestDirectory.Channels {
 		if i.ID == chID {
 			ch = &i
+			break
 		}
 	}
 	if ch == nil {
