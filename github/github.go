@@ -114,7 +114,7 @@ func (gh *Github) fetchDev() (*Version, error) {
 		return nil, err
 	}
 	return &Version{
-		Version:   commit.GetSHA()[0:7],
+		Version:   commit.GetSHA()[0:8],
 		Changelog: "Last commit: " + commit.Commit.GetMessage(),
 		Date:      commit.Commit.Author.GetDate(),
 	}, nil
