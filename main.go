@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 )
 
 var cfg config
@@ -69,27 +70,35 @@ func regenDirectory() error {
 		Description: "Stable releases, tested by Flipper QA",
 	}
 
-	content, err := ioutil.ReadDir(cfg.ArtifactsPath)
+	dirs := make(map[string]struct{})
+	err = filepath.Walk(cfg.ArtifactsPath, func(path string, c os.FileInfo, err error) error {
+		if !c.IsDir() {
+			return nil
+		}
+		delete(dirs, filepath.Dir(path))
+		dirs[path] = struct{}{}
+		return nil
+	})
 	if err != nil {
 		return err
 	}
-	for _, c := range content {
-		if !c.IsDir() {
-			continue
-		}
-		if arrayContains(cfg.Excluded, c.Name()) {
+
+	for path := range dirs {
+		name := strings.TrimPrefix(path, strings.TrimPrefix(cfg.ArtifactsPath, "./"))
+		name = strings.TrimLeft(name, "/")
+		if arrayContains(cfg.Excluded, name) {
 			continue
 		}
 
-		ver, isBranch := gh.Lookup(c.Name())
+		ver, isBranch := gh.Lookup(name)
 		if isBranch {
 			continue
 		}
 		if ver == nil {
-			log.Println("Deleting", c.Name())
-			err = os.RemoveAll(filepath.Join(cfg.ArtifactsPath, c.Name()))
+			log.Println("Deleting", name)
+			err = removeWithParents(filepath.Join(cfg.ArtifactsPath, name))
 			if err != nil {
-				log.Println("Can't delete", c.Name(), err)
+				log.Println("Can't delete", name, err)
 			}
 			continue
 		}
@@ -98,10 +107,10 @@ func regenDirectory() error {
 			Version:   ver.Version,
 			Changelog: ver.Changelog,
 			Timestamp: Time(ver.Date),
-			Files:     scanFiles(c.Name()),
+			Files:     scanFiles(name),
 		}
 
-		if c.Name() == cfg.Github.DevelopmentBranch {
+		if name == cfg.Github.DevelopmentBranch {
 			devChannel.Versions = append(devChannel.Versions, v)
 			continue
 		}

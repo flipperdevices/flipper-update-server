@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"io"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -20,6 +21,36 @@ func isExistingDir(path string) bool {
 		return false
 	}
 	return fi.IsDir()
+}
+
+func removeWithParents(path string) error {
+	err := os.RemoveAll(path)
+	if err != nil {
+		return err
+	}
+	parent := filepath.Dir(path)
+	empty, err := isDirEmpty(parent)
+	if err != nil {
+		return err
+	}
+	if empty {
+		return removeWithParents(parent)
+	}
+	return nil
+}
+
+func isDirEmpty(path string) (bool, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return false, err
+	}
+	defer f.Close()
+
+	_, err = f.Readdirnames(1)
+	if err == io.EOF {
+		return true, nil
+	}
+	return false, err
 }
 
 func arrayContains(stack []string, needle string) bool {
