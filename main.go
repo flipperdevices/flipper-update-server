@@ -1,15 +1,17 @@
 package main
 
 import (
-	"github.com/caarlos0/env/v6"
-	"github.com/flipper-zero/flipper-update-server/github"
-	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+
+	"github.com/caarlos0/env/v6"
+	"github.com/coreos/go-semver/semver"
+	"github.com/flipper-zero/flipper-update-server/github"
+	"github.com/gin-gonic/gin"
 )
 
 var cfg config
@@ -124,10 +126,17 @@ func regenDirectory() error {
 	latestDirectory = directory{
 		Channels: []channel{devChannel, rcChannel, releaseChannel},
 	}
-	for _, c := range latestDirectory.Channels {
+	for k := range latestDirectory.Channels {
+		c := &latestDirectory.Channels[k]
 		sort.Slice(c.Versions, func(i, j int) bool {
-			return c.Versions[i].Timestamp.Time().Before(c.Versions[j].Timestamp.Time())
+			v1, err := semver.NewVersion(c.Versions[i].Version)
+			v2, err := semver.NewVersion(c.Versions[j].Version)
+			if err != nil {
+				return c.Versions[i].Timestamp.Time().Before(c.Versions[j].Timestamp.Time())
+			}
+			return !v1.LessThan(*v2)
 		})
+		c.Versions = c.Versions[:1]
 	}
 
 	return nil
