@@ -11,7 +11,7 @@ import (
 )
 
 var regexes = []*regexp.Regexp{
-	regexp.MustCompile(`(?m)^flipper-z-(f[0-9]*|any)-(update|updater|bootloader|firmware|full|core2_firmware|scripts|resources|sdk)-.*\.(dfu|bin|elf|hex|tgz|json|zip)$`),
+	regexp.MustCompile(`(?m)^flipper-z-(f[0-9]*|any)-(update|updater|bootloader|firmware|full|core2_firmware|scripts|resources|sdk|lib)-.*\.(dfu|bin|elf|hex|tgz|json|zip)$`),
 	regexp.MustCompile(`(?m)^(f[0-9]*)_(bootloader|firmware|full)\.(dfu|bin|elf|hex)$`),
 }
 
