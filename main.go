@@ -136,9 +136,7 @@ func regenDirectory() error {
 			}
 			return !v1.LessThan(*v2)
 		})
-		if len(c.Versions) > 1 {
-			c.Versions = c.Versions[:1]
-		}
+		c.Versions = c.Versions[:1]
 	}
 
 	return nil
